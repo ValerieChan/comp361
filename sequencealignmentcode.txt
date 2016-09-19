@@ -1,0 +1,314 @@
+public class sequenceAlignment {
+
+	private static boolean test;
+
+	public static void main(String[] args){
+		System.out.println("------Examples------");
+		test = true;
+		dynamic("GATCGGCAT","CAATGTGAATC");
+		dynamic("AAGCAAA", "AGCTACA");
+		dynamic("AGCTAGG","GGATCGA");
+		dynamic("AGGCCATA","AGGCCATA");
+		test = false;
+		System.out.println("------Run Time Testing-------");
+		
+		
+		String [] A = generate(10);
+		String [] B = generate(10);
+
+		run(A,B);
+		
+		int [] n = {10,50,100,200, 300, 400, 500, 600, 700, 800, 1000};
+		long av =0;
+		long temp = 0;
+		System.out.println( "random");
+		for (int j =0 ; j<n.length ; j++ ){
+		
+		av =0;
+		for (int i=0; i< 10; i++){
+			A = generate(n[j]);
+			B = generate(n[j]);
+			temp = run(A, B);
+			av+= temp;
+		}
+		System.out.print(av/10 + ", ");
+		}
+		
+		System.out.println( "random");
+		for (int j =0 ; j<n.length ; j++ ){
+		
+		av =0;
+		for (int i=0; i< 10; i++){
+			A = generate(n[j]);
+			B = generate(n[j]);
+			temp = run(A, B);
+			av+= temp;
+		}
+		System.out.print(av/10 + ", ");
+		}
+		
+		System.out.println( "reverse");
+		
+		for (int j =0 ; j<n.length ; j++ ){
+		av =0;
+		for (int i=0; i< 10; i++){
+			A = generate(n[j]);
+			String [] Ar = reverse(A);
+			temp = run(A, Ar);
+			av+= temp;
+		}
+		System.out.print(av/10 + ", ");
+		}
+		
+		
+		System.out.println( "same");
+		for (int j =0 ; j<n.length ; j++ ){
+		av =0;
+		for (int i=0; i< 10; i++){
+			A = generate(n[j]);
+			av += run(A, A);
+		}
+		System.out.print(av/10 + ", ");
+		}
+		
+		System.out.println( "different");
+		for (int j =0 ; j<n.length ; j++ ){
+		av =0;
+		A = Gdifferent(n[j], 1);
+		B = Gdifferent(n[j], 2);
+		for (int i=0; i< 10; i++){
+			av += run(A, A);
+		}
+		System.out.print(av/10 + ", ");
+		}
+		
+
+	}
+	
+	public static long run(String [] A, String [] B){
+		long startTime;	
+		long endTime;	
+		long average=0;
+		startTime = System.nanoTime();
+		for (int i =0; i<A.length; i++){
+			
+			dynamic(A[i], B[i]);
+			
+		}
+		endTime = System.nanoTime();
+		long temp = endTime-startTime;
+		average +=  (temp );
+		
+		return average/A.length;
+	}
+	
+	public static String [] reverse(String [] list){
+		String [] list2 = new String [list.length];
+		for(int i= 0; i< list.length; i++){
+			list2[i] = new StringBuilder(list[i]).reverse().toString();
+		}
+		return list2;
+	}
+	
+	public static String [] generate(int len){
+		String [] list = new String [100];
+		int length ;
+		double r;
+		String w;
+		for(int i=0; i< 100; i++){
+			w="";
+			length = len;//(int) (Math.random()*len);
+			for(int j=0; j< length; j++){
+				r = Math.random();
+				if(r < 0.25){w+= "G";}
+				else if(r < 0.5){w+= "A";}
+				else if (r < 0.75){w+= "C";}
+				else{ w+= "T";}
+			}
+			list[i] = w;
+		}
+		
+		//printout(list);
+		return list;
+	}
+	
+	public static String[] Gdifferent(int len, int seed){
+		String [] list = new String [100];		
+		for(int i=0; i< 100; i++){
+			int x = 0;
+			String temp ="";
+			if (seed == 1){
+				while (x < len){
+					temp += "G";
+					x++;
+				}
+				list[i] =temp;
+				seed++;
+			}
+			else if (seed==2){while (x < len){temp += "A";x++;}list[i] =temp;seed++;}
+			else if (seed==3){while (x < len){temp += "C";x++;}list[i] =temp;seed++;}
+			else if (seed==4){while (x < len){temp += "T";x++;}list[i] =temp;seed =1;}
+			
+		}
+		return list;
+	}
+	
+
+	
+	public static void dynamic(String A, String B){
+		
+		String[] AList = A.split("");
+		String[] BList = B.split("");
+		int [][] table = fillTable(AList, BList);
+		//printout(table);
+		match(table, AList, BList);
+	}
+
+	private static void printout(String[] table) {
+		String line = "";
+			for (int j = 0; j<table.length; j++){
+				line += " " +table[j];
+			}
+			System.out.println(line);
+
+		
+	}
+
+	private static void printout(int[][] table) {
+		for (int i =0; i < table.length; i++){
+			String line = "";
+			for (int j = 0; j<table[0].length; j++){
+				line += " " +table[i][j];
+			}
+			System.out.println(line);
+		}
+		
+	}
+
+	private static int [][]  fillTable(String [] A, String [] B) {
+		//printout(A);
+		//printout(B);
+		int [][] t = new int [A.length][B.length];
+		int one, two, three, match= 0;
+		for (int i =0; i < A.length; i++){
+			for (int j = 0; j<B.length; j++){
+				if(i ==0 || j ==0){ 
+					t[i][j] = 0;
+					//System.out.println("Col : "+j +" Row : "+i +" Value: "+ t[i][j]+" - a-"+ A[i] +" b-"+B[j]);
+				}
+				else {
+					if(A[i].equals(B[j])){match =1;}
+					else{match = 0;}
+				    // Mi-1, j-1 + Si,j (i, j: match = 1, mismatch = 0),
+					one = t[i-1][j-1] + match;
+				    // Mi,j-1 + w 
+					two = t[i][j-1] ;
+				    // Mi-1,j + w 
+					three = t[i-1][j];
+					//int max(int arg1, int arg2)
+					t[i][j] = Math.max(one ,Math.max(two , three));
+				}
+
+			}
+			//System.out.println("end of row?");
+		}
+		return t;
+	}
+
+	
+	private static void match(int[][] table, String [] A, String [] B) {
+		//printout(table);
+		ArrayList<String> spaceA = new ArrayList<>();
+		ArrayList<String> spaceB = new ArrayList<>();
+		//start in the bottom right corner
+		int i = A.length -1; 
+		int j = B.length -1; 
+		while (i > 0 && j >0){
+			//System.out.println("Col : "+j +", Row : "+i +", Value: "+ table[i][j]+", A: "+A[i]+", B: "+B[j]);
+		//if the letters match, go to the diagonal
+			if(A[i].equals(B[j])){
+				spaceA.add(A[i]);
+				spaceB.add(B[j]);
+				i --;
+				j--;
+			} else if(table[i-1][j] == table [i][j]){
+
+				spaceA.add(A[i]);
+				spaceB.add(" ");
+				i--;
+			} else {
+				spaceA.add(" "); //might need to be B
+				spaceB.add(B[j]);
+				j--;
+			}
+			
+		}
+		if(i > 0){
+			//add the rest of A to spaceA
+			while (i > 0){
+				spaceA.add(A[i]);
+				spaceB.add(" ");
+				i--;
+			}
+		}
+		if(j > 0){
+			//add the rest of A to spaceA
+			while (j>0){
+				spaceB.add(B[j]);
+				spaceA.add(" ");
+				j--;
+			}
+		}
+		
+		for(i=0; i< spaceA.size()-1; i++){
+			if(spaceA.get(i).equals(" ") && !spaceB.get(i).equals(" ")){
+				if(!spaceA.get(i+1).equals(" ") && spaceB.get(i+1).equals(" ")){
+					//remove Ai and Bi+1
+					spaceA.remove(i);
+					spaceB.remove(i+1);
+				}
+			} else if(!spaceA.get(i).equals(" ") && spaceB.get(i).equals(" ")){
+				if(spaceA.get(i+1).equals(" ") && !spaceB.get(i+1).equals(" ")){
+					//remove Ai and Bi+1
+					spaceA.remove(i+1);
+					spaceB.remove(i);
+				}
+			}
+		}
+		
+		String Aword = "";
+		for(int k = 0; k< spaceA.size(); k++){
+			Aword += spaceA.get(spaceA.size()-1-k);
+		} 
+		String Bword = "";
+		for(int l = 0; l< spaceB.size(); l++){
+			Bword += spaceB.get(spaceB.size()-1 -l);
+		}
+		if(test == true ){
+		System.out.println(Aword);
+		System.out.println(Bword);
+		}
+		score(spaceA, spaceB);
+	}
+
+	private static void score(ArrayList<String> spaceA, ArrayList<String> spaceB) {
+		String line = "";
+		int score = 0;
+		for (int j = 0; j<spaceA.size(); j++){
+			if (spaceA.get(j).equals(spaceB.get(j))){
+				line = "+"+line;
+				score ++;
+			} else if(spaceA.get(j).equals(" ") | spaceB.get(j).equals(" ")){
+				line = "*"+line;
+				score --;
+				score --;
+			} else {
+				line = "-"+line;
+				score --;
+			}
+		}
+		if(test == true ){
+		System.out.println(line + " ("+score+")");
+		}
+	}
+}
